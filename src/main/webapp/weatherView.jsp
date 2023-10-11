@@ -16,7 +16,7 @@
     <%= request.getAttribute("location") + " - погода на текущий момент:" %>
 </h1>
 <p>
-    <%= "Температура воздуха: " + request.getAttribute("currentTemp") + " °C." %>
+    <%= "Температура воздуха: " + request.getAttribute("currentTemp") + " °C, " + request.getAttribute("currentText") %>
 </p>
 <p>
     <%= "Ощущается как: " + request.getAttribute("currentFeels") + " °C." %>

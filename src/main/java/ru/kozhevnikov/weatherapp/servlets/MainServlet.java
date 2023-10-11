@@ -20,12 +20,11 @@ import java.util.Properties;
 
 @WebServlet("/get_weather")
 public class MainServlet extends HttpServlet {
-    private static String apiKeyCurrent;
-    private static String apiKeyForecast;
+    private static String apiKey;
     private String location;
     private WeatherApiService weatherApiService;
     private WeatherDataProcessor weatherDataProcessor;
-    private static final String NO_PARAMS = "Передайте в параметры запроса город, в готором Вы хотите узнать погоду";
+    private static final String NO_PARAMS = "Передайте в параметры запроса город, в котором Вы хотите узнать погоду";
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
 
     @Override
@@ -36,9 +35,8 @@ public class MainServlet extends HttpServlet {
 
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
             properties.load(inputStream);
-            apiKeyCurrent = properties.getProperty("api.openweather");
-            apiKeyForecast = properties.getProperty("api.weatherapi");
-            weatherApiService = new WeatherApiService(apiKeyCurrent, apiKeyForecast);
+            apiKey = properties.getProperty("api.key");
+            weatherApiService = new WeatherApiService(apiKey);
             weatherDataProcessor = new WeatherDataProcessor();
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,34 +56,32 @@ public class MainServlet extends HttpServlet {
             resp.getWriter().write(NO_PARAMS);
         } else {
             session.setAttribute("location", location);
-
             if (!initJsonNodesAndSetAttributes(req, resp)) return;
-
             RequestDispatcher dispatcher = req.getRequestDispatcher("/weatherView.jsp");
-
             dispatcher.forward(req, resp);
         }
     }
 
     private boolean initJsonNodesAndSetAttributes(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        JsonNode locationData = weatherApiService.getCoordinatesByLocation(location);
+        JsonNode currentData = weatherApiService.getCurrentWeatherByLocation(location);
+        JsonNode hourlyWeatherData = weatherApiService.getHourlyWeatherByLocation(location);
+        JsonNode weatherForecastData = weatherApiService.getWeatherForecastByLocation(location);
 
-        if (locationData.isEmpty()) {
+        if (hourlyWeatherData == null || weatherForecastData == null){
             resp.getWriter().write(INCORRECT_NAME);
             return false;
         }
 
-        JsonNode hourlyWeatherData = weatherApiService.getHourlyWeatherByCityName(location);
-        JsonNode weatherForecast = weatherApiService.getWeatherForecastByCityName(location);
+        List<String> currentWeather = weatherDataProcessor.getCurrentWeather(currentData);
+        Map<Integer, String> hourlyWeather = weatherDataProcessor.getHourlyWeather(hourlyWeatherData);
+        Map<Integer, String> weatherForecast = weatherDataProcessor.getWeatherForecast(weatherForecastData);
 
-        double[] coordinates = weatherDataProcessor.getCoordinates(locationData);
-        JsonNode currentWeatherData = weatherApiService.getCurrentWeatherByCoordinates(coordinates[0], coordinates[1]);
-
-        req.setAttribute("location", weatherDataProcessor.getLocalName(locationData));
-        req.setAttribute("currentTemp", weatherDataProcessor.getCurrentWeather(currentWeatherData).get(0));
-        req.setAttribute("currentFeels", weatherDataProcessor.getCurrentWeather(currentWeatherData).get(1));
-        req.setAttribute("weatherPerHours", weatherDataProcessor.getHourlyWeather(hourlyWeatherData));
-        req.setAttribute("forecast", weatherDataProcessor.getWeatherForecast(weatherForecast));
+        req.setAttribute("location", location);
+        req.setAttribute("currentTemp", currentWeather.get(0));
+        req.setAttribute("currentText", currentWeather.get(1));
+        req.setAttribute("currentFeels", currentWeather.get(2));
+        req.setAttribute("weatherPerHours", hourlyWeather);
+        req.setAttribute("forecast", weatherForecast);
 
         return true;
     }

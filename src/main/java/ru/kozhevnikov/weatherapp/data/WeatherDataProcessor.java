@@ -6,27 +6,16 @@ import java.util.*;
 
 public class WeatherDataProcessor {
 
-    public double[] getCoordinates(JsonNode coordinatesNode) {
-        double[] coordinates = new double[2];
-
-        coordinates[0] = Double.parseDouble(coordinatesNode.get(0).get("lat").toString());
-        coordinates[1] = Double.parseDouble(coordinatesNode.get(0).get("lon").toString());
-
-        return coordinates;
-    }
-
-    public String getLocalName(JsonNode coordinatesNode) {
-        return coordinatesNode.get(0).get("local_names").get("ru").toString();
-    }
-
     public List<String> getCurrentWeather(JsonNode currentWeatherNode) {
         List<String> currentWeather = new ArrayList<>();
 
-        String current = currentWeatherNode.get("main").get("temp").toString();
-        String feelsLike = currentWeatherNode.get("main").get("feels_like").toString();
+        String currentTemperature = currentWeatherNode.get("current").get("temp_c").toString();
+        String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
+        String currentFeelsTemperature = currentWeatherNode.get("current").get("feelslike_c").toString();
 
-        currentWeather.add(current);
-        currentWeather.add(feelsLike);
+        currentWeather.add(currentTemperature);
+        currentWeather.add(currentText);
+        currentWeather.add(currentFeelsTemperature);
 
         return currentWeather;
     }
