@@ -2,9 +2,6 @@ package ru.kozhevnikov.weatherapp.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
 
 public class WeatherDataProcessor {
@@ -65,7 +62,7 @@ public class WeatherDataProcessor {
                     .get("forecastday")
                     .get(i)
                     .get("day")
-                    .get("maxtemp_c").toString();
+                    .get("avgtemp_c").toString();
 
             weatherForecast.put(i, date+" : "+temperature + " °C.");
         }

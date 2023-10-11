@@ -3,7 +3,6 @@ package ru.kozhevnikov.weatherapp.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.w3c.dom.ls.LSOutput;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,29 +14,29 @@ import java.net.URL;
 
 public class WeatherApiService {
 
-    private final String apiKey;
-    private final String apiKeyForHours;
+    private final String apiKeyCurrent;
+    private final String apiKeyForecast;
 
-    public WeatherApiService(String apiKey, String apiKeyForHours) {
-        this.apiKey = apiKey;
-        this.apiKeyForHours = apiKeyForHours;
+    public WeatherApiService(String apiKeyCurrent, String apiKeyForHours) {
+        this.apiKeyCurrent = apiKeyCurrent;
+        this.apiKeyForecast = apiKeyForHours;
     }
     public JsonNode getCoordinatesByLocation(String location){
-        String currentPlace = "http://api.openweathermap.org/geo/1.0/direct?q=" + location + "&limit=1&appid=" + apiKey;
+        String currentPlace = "http://api.openweathermap.org/geo/1.0/direct?q=" + location + "&limit=1&appid=" + apiKeyCurrent;
         return getJsonNodeFromUrl(currentPlace);
     }
     public JsonNode getCurrentWeatherByCoordinates(double lat,double lon){
         String currentTimeUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat
-                + "&lon=" + lon + "&appid=" + apiKey + "&units=metric";
+                + "&lon=" + lon + "&appid=" + apiKeyCurrent + "&units=metric";
         return getJsonNodeFromUrl(currentTimeUrl);
     }
     public JsonNode getHourlyWeatherByCityName(String city){
-        String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+apiKeyForHours
+        String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+ apiKeyForecast
                 +"&q="+city+"&days=1&aqi=no&alerts=no";
         return getJsonNodeFromUrl(hourlyTimeUrl);
     }
     public JsonNode getWeatherForecastByCityName(String city){
-        String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+apiKeyForHours
+        String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+ apiKeyForecast
                 +"&q="+city+"&days=3&aqi=no&alerts=no";
         return getJsonNodeFromUrl(hourlyTimeUrl);
     }
@@ -65,6 +64,7 @@ public class WeatherApiService {
         return jsonAnswer.toString();
     }
     private JsonNode getJsonNode(String jsonAnswer){
+        if (jsonAnswer == null) return null;
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode;
         try {
