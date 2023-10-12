@@ -8,8 +8,13 @@
 <p> Cведения о погоде предоставляет сервис https://www.weatherapi.com/.
 Для использования приложения необходимо использовать Ваш API-ключ для взаимодействия с сервисом в файле resources/config.properies.
 
-<p> Примеры выполнения запросов:
+<br> Примеры выполнения запросов:
 - При передаче параметра
+<br><br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/WithParam.png)
+- При отсутсвии параметра
+<br><br> ![Ответ без параметра](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/WithoutParam.png)
+- При некорректном введении параметра
+<br><br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/Incorrect.png)
 
 
 
