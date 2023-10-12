@@ -10,7 +10,11 @@
 
 <br> Примеры выполнения запросов:
 - При передаче параметра
-<br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/img/WithParam.png)
+<br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/WithParam.png)
+- При отсутсвии параметра
+<br> ![Ответ без параметра](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/WithoutParam.png)
+- При некорректном введении параметра
+<br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/blob/a7b58ba088e8e5cac262a5b134bc0003d3ea4837/img/Incorrect.png)
 
 
 
