@@ -3,9 +3,16 @@ package ru.kozhevnikov.weatherapp.data;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.*;
-
+/**
+ * Класс {@code WeatherDataProcessor} предоставляет методы для обработки данных о погоде, полученных из JSON-структур.
+ */
 public class WeatherDataProcessor {
-
+    /**
+     * Получает текущие данные о погоде и возвращает их в виде списка строк.
+     *
+     * @param currentWeatherNode JSON-структура с текущими данными о погоде
+     * @return список строк, содержащих текущую температуру, описание и ощущаемую температуру
+     */
     public List<String> getCurrentWeather(JsonNode currentWeatherNode) {
         List<String> currentWeather = new ArrayList<>();
 
@@ -19,7 +26,12 @@ public class WeatherDataProcessor {
 
         return currentWeather;
     }
-
+    /**
+     * Получает почасовой прогноз погоды и возвращает его в виде отображения (Map) с ключами - часами и значениями - данными о погоде.
+     *
+     * @param hourlyWeatherNode JSON-структура с почасовым прогнозом погоды
+     * @return отображение с данными о погоде для каждого часа в течение суток
+     */
     public Map<Integer, String> getHourlyWeather(JsonNode hourlyWeatherNode) {
         Map<Integer, String> hourlyWeather = new TreeMap<>();
         for (int i = 0; i < 24; i++) {
@@ -40,6 +52,12 @@ public class WeatherDataProcessor {
         }
         return hourlyWeather;
     }
+    /**
+     * Получает прогноз погоды на ближайшие дни и возвращает его в виде отображения (Map) с ключами - датами и значениями - данными о погоде.
+     *
+     * @param hourlyWeatherNode JSON-структура с прогнозом погоды на ближайшие дни
+     * @return отображение с данными о погоде на ближайшие дни
+     */
     public Map<Integer, String> getWeatherForecast(JsonNode hourlyWeatherNode) {
         Map<Integer, String> weatherForecast = new TreeMap<>();
         for (int i = 0; i < 3; i++) {

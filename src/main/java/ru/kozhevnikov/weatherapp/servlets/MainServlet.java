@@ -18,8 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Сервлет, в котором реализована логика передачи данных, полученных от стороннего сервиса, на представление - JSP страницу.
+ */
 @WebServlet("/get_weather")
 public class MainServlet extends HttpServlet {
+    /**
+     * Ключ API для доступа к сервису погоды.
+     */
     private static String apiKey;
     private String location;
     private WeatherApiService weatherApiService;
@@ -27,6 +33,13 @@ public class MainServlet extends HttpServlet {
     private static final String NO_PARAMS = "Передайте в параметры запроса город, в котором Вы хотите узнать погоду";
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
 
+    /**
+     * Метод init() инициализирует сервлет, загружая настройки из файла "config.properties"
+     * и создавая объекты для работы с API и данными о погоде.
+     *
+     * @param config предоставляет информацию о конфигурации сервлета
+     * @throws ServletException если происходит ошибка инициализации сервлета
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -56,7 +69,10 @@ public class MainServlet extends HttpServlet {
             resp.getWriter().write(NO_PARAMS);
         } else {
             session.setAttribute("location", location);
-            if (!initJsonNodesAndSetAttributes(req, resp)) return;
+            if (!initJsonNodesAndSetAttributes(req, resp)) {
+                resp.getWriter().write(INCORRECT_NAME);
+                return;
+            }
             RequestDispatcher dispatcher = req.getRequestDispatcher("/weatherView.jsp");
             dispatcher.forward(req, resp);
         }
@@ -68,7 +84,6 @@ public class MainServlet extends HttpServlet {
         JsonNode weatherForecastData = weatherApiService.getWeatherForecastByLocation(location);
 
         if (hourlyWeatherData == null || weatherForecastData == null){
-            resp.getWriter().write(INCORRECT_NAME);
             return false;
         }
 

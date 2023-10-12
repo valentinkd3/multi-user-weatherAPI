@@ -10,6 +10,7 @@
 
   <properties>
     <junit.jupiter.version>5.9.2</junit.jupiter.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mockito.version>5.2.0</mockito.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
@@ -73,6 +74,11 @@
           <source>7</source>
           <target>7</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.0.0</version>
       </plugin>
     </plugins>
   </build>
