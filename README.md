@@ -8,8 +8,9 @@
 <p> Cведения о погоде предоставляет сервис https://www.weatherapi.com/.
 Для использования приложения необходимо использовать Ваш API-ключ для взаимодействия с сервисом в файле resources/config.properies.
 
-<p> Примеры выполнения запросов:
+<br> Примеры выполнения запросов:
 - При передаче параметра
+<br> ![Ответ с параментрами](https://github.com/valentinkd3/trainee_weather_restapi/img/WithParam.png)
 
 
 
