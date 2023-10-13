@@ -34,7 +34,7 @@ public class WeatherApiService {
      * @param location локация, для которой запрашивается погода
      * @return JSON-структура с текущей погодой
      */
-    public JsonNode getCurrentWeatherByLocation(String location){
+    public JsonNode getJsonCurrentWeather(String location){
         String currentTimeUrl = "http://api.weatherapi.com/v1/current.json?key=" + apiKey
                 + "&q=" + location + "&aqi=no&lang=ru";
         return getJsonNodeFromUrl(currentTimeUrl);
@@ -45,7 +45,7 @@ public class WeatherApiService {
      * @param location локация, для которой запрашивается погода
      * @return JSON-структура с почасовым прогнозом погоды
      */
-    public JsonNode getHourlyWeatherByLocation(String location){
+    public JsonNode getJsonHourlyWeather(String location){
         String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+ apiKey
                 +"&q="+location+"&days=1&aqi=no&alerts=no";
         return getJsonNodeFromUrl(hourlyTimeUrl);
@@ -56,7 +56,7 @@ public class WeatherApiService {
      * @param location локация, для которой запрашивается погода
      * @return JSON-структура с прогнозом погоды на три дня
      */
-    public JsonNode getWeatherForecastByLocation(String location){
+    public JsonNode getJsonForecastWeather(String location){
         String hourlyTimeUrl = "http://api.weatherapi.com/v1/forecast.json?key="+ apiKey
                 +"&q="+location+"&days=3&aqi=no&alerts=no";
         return getJsonNodeFromUrl(hourlyTimeUrl);

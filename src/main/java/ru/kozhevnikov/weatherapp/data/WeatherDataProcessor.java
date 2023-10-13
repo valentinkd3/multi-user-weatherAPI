@@ -1,8 +1,10 @@
 package ru.kozhevnikov.weatherapp.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import ru.kozhevnikov.weatherapp.model.Weather;
 
 import java.util.*;
+
 /**
  * Класс {@code WeatherDataProcessor} предоставляет методы для обработки данных о погоде, полученных из JSON-структур.
  */
@@ -13,27 +15,39 @@ public class WeatherDataProcessor {
      * @param currentWeatherNode JSON-структура с текущими данными о погоде
      * @return список строк, содержащих текущую температуру, описание и ощущаемую температуру
      */
-    public List<String> getCurrentWeather(JsonNode currentWeatherNode) {
-        List<String> currentWeather = new ArrayList<>();
+    private Weather weather;
 
-        String currentTemperature = currentWeatherNode.get("current").get("temp_c").toString();
-        String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
-        String currentFeelsTemperature = currentWeatherNode.get("current").get("feelslike_c").toString();
-
-        currentWeather.add(currentTemperature);
-        currentWeather.add(currentText);
-        currentWeather.add(currentFeelsTemperature);
-
-        return currentWeather;
+    public Weather getWeather(String location,
+                              JsonNode cur,
+                              JsonNode hourly,
+                              JsonNode forecast) {
+        weather = new Weather(location);
+        initCurrentWeather(cur);
+        initHourlyWeather(hourly);
+        initWeatherForecast(forecast);
+        return weather;
     }
+
+    public void initCurrentWeather(JsonNode currentWeatherNode) {
+        int currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
+        String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
+        int currentTemperatureFeelsLike = currentWeatherNode.get("current").get("feelslike_c").asInt();
+        int avgTemperature = currentWeatherNode.get("current").get("avgtemp_c").asInt();
+
+        weather.setCurrentTemperature(currentTemperature);
+        weather.setCurrentText(currentText);
+        weather.setCurrentTemperatureFeelsLike(currentTemperatureFeelsLike);
+        weather.setAverageTemperature(avgTemperature);
+    }
+
     /**
      * Получает почасовой прогноз погоды и возвращает его в виде отображения (Map) с ключами - часами и значениями - данными о погоде.
      *
      * @param hourlyWeatherNode JSON-структура с почасовым прогнозом погоды
      * @return отображение с данными о погоде для каждого часа в течение суток
      */
-    public Map<Integer, String> getHourlyWeather(JsonNode hourlyWeatherNode) {
-        Map<Integer, String> hourlyWeather = new TreeMap<>();
+    public void initHourlyWeather(JsonNode hourlyWeatherNode) {
+        Map<String, Integer> hourlyWeather = new LinkedHashMap<>();
         for (int i = 0; i < 24; i++) {
             String date = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
@@ -41,38 +55,39 @@ public class WeatherDataProcessor {
                     .get("hour")
                     .get(i)
                     .get("time").toString();
-            String temperature = hourlyWeatherNode.get("forecast")
+            Integer temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(0)
                     .get("hour")
                     .get(i)
-                    .get("temp_c").toString();
+                    .get("temp_c").asInt();
 
-            hourlyWeather.put(i, date+" : "+temperature + " °C.");
+            hourlyWeather.put(date, temperature);
         }
-        return hourlyWeather;
+        weather.setHourlyWeather(hourlyWeather);
     }
+
     /**
      * Получает прогноз погоды на ближайшие дни и возвращает его в виде отображения (Map) с ключами - датами и значениями - данными о погоде.
      *
      * @param hourlyWeatherNode JSON-структура с прогнозом погоды на ближайшие дни
      * @return отображение с данными о погоде на ближайшие дни
      */
-    public Map<Integer, String> getWeatherForecast(JsonNode hourlyWeatherNode) {
-        Map<Integer, String> weatherForecast = new TreeMap<>();
+    public void initWeatherForecast(JsonNode hourlyWeatherNode) {
+        Map<String, Integer> weatherForecast = new LinkedHashMap<>();
         for (int i = 0; i < 3; i++) {
             String date = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(i)
                     .get("date").toString();
-            String temperature = hourlyWeatherNode.get("forecast")
+            Integer temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(i)
                     .get("day")
-                    .get("avgtemp_c").toString();
+                    .get("avgtemp_c").asInt();
 
-            weatherForecast.put(i, date+" : "+temperature + " °C.");
+            weatherForecast.put(date, temperature);
         }
-        return weatherForecast;
+        weather.setForecastWeather(weatherForecast);
     }
 }

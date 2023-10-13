@@ -2,7 +2,9 @@ package ru.kozhevnikov.weatherapp.servlets;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import ru.kozhevnikov.weatherapp.api.WeatherApiService;
+import ru.kozhevnikov.weatherapp.dao.WeatherDAO;
 import ru.kozhevnikov.weatherapp.data.WeatherDataProcessor;
+import ru.kozhevnikov.weatherapp.model.Weather;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -14,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,6 +27,7 @@ public class MainServlet extends HttpServlet {
      * Ключ API для доступа к сервису погоды.
      */
     private static String apiKey;
+    private WeatherDAO weatherDAO;
     private String location;
     private WeatherApiService weatherApiService;
     private WeatherDataProcessor weatherDataProcessor;
@@ -34,7 +35,7 @@ public class MainServlet extends HttpServlet {
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
 
     /**
-     * Метод init() инициализирует сервлет, загружая настройки из файла "config.properties"
+     * Метод init() инициализирует сервлет, загружая настройки из файла "api.properties"
      * и создавая объекты для работы с API и данными о погоде.
      *
      * @param config предоставляет информацию о конфигурации сервлета
@@ -46,11 +47,12 @@ public class MainServlet extends HttpServlet {
 
         Properties properties = new Properties();
 
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("api.properties")) {
             properties.load(inputStream);
             apiKey = properties.getProperty("api.key");
             weatherApiService = new WeatherApiService(apiKey);
             weatherDataProcessor = new WeatherDataProcessor();
+            weatherDAO = new WeatherDAO();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,34 +71,29 @@ public class MainServlet extends HttpServlet {
             resp.getWriter().write(NO_PARAMS);
         } else {
             session.setAttribute("location", location);
-            if (!initJsonNodesAndSetAttributes(req, resp)) {
+            if (!initJsonNodesAndSetAttributes(req)) {
                 resp.getWriter().write(INCORRECT_NAME);
                 return;
             }
+
             RequestDispatcher dispatcher = req.getRequestDispatcher("/weatherView.jsp");
             dispatcher.forward(req, resp);
         }
     }
 
-    private boolean initJsonNodesAndSetAttributes(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        JsonNode currentData = weatherApiService.getCurrentWeatherByLocation(location);
-        JsonNode hourlyWeatherData = weatherApiService.getHourlyWeatherByLocation(location);
-        JsonNode weatherForecastData = weatherApiService.getWeatherForecastByLocation(location);
+
+    private boolean initJsonNodesAndSetAttributes(HttpServletRequest req) throws IOException {
+        JsonNode currentData = weatherApiService.getJsonCurrentWeather(location);
+        JsonNode hourlyWeatherData = weatherApiService.getJsonHourlyWeather(location);
+        JsonNode weatherForecastData = weatherApiService.getJsonForecastWeather(location);
 
         if (hourlyWeatherData == null || weatherForecastData == null){
             return false;
         }
 
-        List<String> currentWeather = weatherDataProcessor.getCurrentWeather(currentData);
-        Map<Integer, String> hourlyWeather = weatherDataProcessor.getHourlyWeather(hourlyWeatherData);
-        Map<Integer, String> weatherForecast = weatherDataProcessor.getWeatherForecast(weatherForecastData);
-
-        req.setAttribute("location", location);
-        req.setAttribute("currentTemp", currentWeather.get(0));
-        req.setAttribute("currentText", currentWeather.get(1));
-        req.setAttribute("currentFeels", currentWeather.get(2));
-        req.setAttribute("weatherPerHours", hourlyWeather);
-        req.setAttribute("forecast", weatherForecast);
+        Weather weather = weatherDataProcessor.getWeather(location, currentData,hourlyWeatherData,weatherForecastData);
+        weatherDAO.acceptToDatabase(weather);
+        req.setAttribute("weather", weather);
 
         return true;
     }

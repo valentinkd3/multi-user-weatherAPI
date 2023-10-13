@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page import="java.util.*" %>
+<%@ page import="ru.kozhevnikov.weatherapp.model.Weather" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -13,26 +14,31 @@
 </head>
 <body>
 <h1>
-    <%= request.getAttribute("location") + " - погода на текущий момент:" %>
+    <%
+        Weather weather = (Weather) request.getAttribute("weather");
+        out.println(weather.getLocation() + " - погода на текущий момент:");
+    %>
 </h1>
 <p>
-    <%= "Температура воздуха: " + request.getAttribute("currentTemp") + " °C, " + request.getAttribute("currentText") %>
+    <%=
+        "Температура воздуха: " + weather.getCurrentTemperature() + " °C, " + weather.getCurrentText()
+    %>
 </p>
 <p>
-    <%= "Ощущается как: " + request.getAttribute("currentFeels") + " °C." %>
+    <%= "Ощущается как: " + weather.getCurrentTemperatureFeelsLike() + " °C." %>
 </p>
 <h2>Погода в ближайшие дни</h2>
 <%
-    Map<Integer, String> forecast = (Map<Integer, String>) request.getAttribute("forecast");
-    for (int i = 0; i < forecast.size(); i++) {
-        out.println("<p>" + forecast.get(i) + "</p>");
+    Map<String, Integer> forecast = weather.getForecastWeather();
+    for (Map.Entry<String,Integer> forecastWeather : forecast.entrySet()) {
+        out.println("<p>" + forecastWeather.getKey() + " : " + forecastWeather.getValue() +" °C.</p>");
     }
 %>
 <h2>Погода сегодня в течение дня</h2>
 <%
-    Map<Integer, String> weather = (Map<Integer, String>) request.getAttribute("weatherPerHours");
-    for (int i = 0; i < weather.size(); i++) {
-        out.println("<p>" + weather.get(i) + "</p>");
+    Map<String, Integer> hourly = weather.getHourlyWeather();
+    for (Map.Entry<String,Integer> hour : hourly.entrySet()) {
+        out.println("<p>" + hour.getKey() + " : " + hour.getValue() + " °C.</p>");
     }
 %>
 </body>
