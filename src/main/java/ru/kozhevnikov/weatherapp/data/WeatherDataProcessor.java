@@ -29,15 +29,13 @@ public class WeatherDataProcessor {
     }
 
     public void initCurrentWeather(JsonNode currentWeatherNode) {
-        int currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
+        int  currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
         String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
         int currentTemperatureFeelsLike = currentWeatherNode.get("current").get("feelslike_c").asInt();
-        int avgTemperature = currentWeatherNode.get("current").get("avgtemp_c").asInt();
 
         weather.setCurrentTemperature(currentTemperature);
         weather.setCurrentText(currentText);
         weather.setCurrentTemperatureFeelsLike(currentTemperatureFeelsLike);
-        weather.setAverageTemperature(avgTemperature);
     }
 
     /**
@@ -55,7 +53,7 @@ public class WeatherDataProcessor {
                     .get("hour")
                     .get(i)
                     .get("time").toString();
-            Integer temperature = hourlyWeatherNode.get("forecast")
+            int temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(0)
                     .get("hour")
@@ -80,7 +78,8 @@ public class WeatherDataProcessor {
                     .get("forecastday")
                     .get(i)
                     .get("date").toString();
-            Integer temperature = hourlyWeatherNode.get("forecast")
+
+            int temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(i)
                     .get("day")
@@ -89,5 +88,12 @@ public class WeatherDataProcessor {
             weatherForecast.put(date, temperature);
         }
         weather.setForecastWeather(weatherForecast);
+
+        int avgTemperature = hourlyWeatherNode.get("forecast")
+                .get("forecastday")
+                .get(0)
+                .get("day")
+                .get("avgtemp_c").asInt();
+        weather.setAverageTemperature(avgTemperature);
     }
 }

@@ -5,6 +5,7 @@ import ru.kozhevnikov.weatherapp.api.WeatherApiService;
 import ru.kozhevnikov.weatherapp.dao.WeatherDAO;
 import ru.kozhevnikov.weatherapp.data.WeatherDataProcessor;
 import ru.kozhevnikov.weatherapp.model.Weather;
+import ru.kozhevnikov.weatherapp.utils.ApiConnection;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -26,38 +27,13 @@ public class MainServlet extends HttpServlet {
     /**
      * Ключ API для доступа к сервису погоды.
      */
-    private static String apiKey;
-    private WeatherDAO weatherDAO;
-    private String location;
-    private WeatherApiService weatherApiService;
-    private WeatherDataProcessor weatherDataProcessor;
+    private static final String API_KEY = ApiConnection.getApiKey();
+    private WeatherDAO weatherDAO = new WeatherDAO();
+    private WeatherApiService weatherApiService = new WeatherApiService(API_KEY);
+    private WeatherDataProcessor weatherDataProcessor = new WeatherDataProcessor();
     private static final String NO_PARAMS = "Передайте в параметры запроса город, в котором Вы хотите узнать погоду";
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
-
-    /**
-     * Метод init() инициализирует сервлет, загружая настройки из файла "api.properties"
-     * и создавая объекты для работы с API и данными о погоде.
-     *
-     * @param config предоставляет информацию о конфигурации сервлета
-     * @throws ServletException если происходит ошибка инициализации сервлета
-     */
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-
-        Properties properties = new Properties();
-
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("api.properties")) {
-            properties.load(inputStream);
-            apiKey = properties.getProperty("api.key");
-            weatherApiService = new WeatherApiService(apiKey);
-            weatherDataProcessor = new WeatherDataProcessor();
-            weatherDAO = new WeatherDAO();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    private String location;
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
