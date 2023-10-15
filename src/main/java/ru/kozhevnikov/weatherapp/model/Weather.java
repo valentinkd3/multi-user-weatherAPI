@@ -1,38 +1,27 @@
 package ru.kozhevnikov.weatherapp.model;
 
+import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 
 public class Weather {
     private int id;
-    private String location;
+    private City city;
     private int currentTemperature;
     private int currentTemperatureFeelsLike;
     private String currentText;
     private int averageTemperature;
+    private int cloud;
+    private double precipitation;
     private Map<String, Integer> hourlyWeather;
     private Map<String, Integer> forecastWeather;
 
-    public Weather(String location) {
-        this.location = location;
-    }
 
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getLocation(){
-        return location;
-    }
-
     public int getAverageTemperature() {
         return averageTemperature;
     }
@@ -45,7 +34,6 @@ public class Weather {
     public void setCurrentTemperatureFeelsLike(int currentTemperatureFeelsLike) {
         this.currentTemperatureFeelsLike = currentTemperatureFeelsLike;
     }
-
     public int getCurrentTemperature() {
         return currentTemperature;
     }
@@ -78,27 +66,40 @@ public class Weather {
         this.forecastWeather = forecastWeather;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Weather weather = (Weather) o;
-        return Objects.equals(location, weather.location);
+    public City getCity() {
+        return city;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(location);
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public int getCloud() {
+        return cloud;
+    }
+
+    public void setCloud(int cloud) {
+        this.cloud = cloud;
+    }
+
+    public double getPrecipitation() {
+        return precipitation;
+    }
+
+    public void setPrecipitation(double precipitation) {
+        this.precipitation = precipitation;
     }
 
     @Override
     public String toString() {
-        return "{" +
-                "location='" + location + '\'' +
+        return "Weather{" +
+                "city=" + city.getName() +
                 ", currentTemperature=" + currentTemperature +
                 ", currentTemperatureFeelsLike=" + currentTemperatureFeelsLike +
                 ", currentText='" + currentText + '\'' +
                 ", averageTemperature=" + averageTemperature +
+                ", cloud=" + cloud +
+                ", precipitation=" + precipitation +
                 '}';
     }
 }

@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page import="java.util.*" %>
+<%@ page import="ru.kozhevnikov.weatherapp.model.City" %>
 <%@ page import="ru.kozhevnikov.weatherapp.model.Weather" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -15,8 +16,9 @@
 <body>
 <h1>
     <%
-        Weather weather = (Weather) request.getAttribute("weather");
-        out.println(weather.getLocation() + " - погода на текущий момент:");
+        City city = (City) request.getAttribute("city");
+        Weather weather = city.getWeather();
+        out.println(city.getName() + " - погода на текущий момент:");
     %>
 </h1>
 <p>

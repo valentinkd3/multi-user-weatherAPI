@@ -1,6 +1,7 @@
 package ru.kozhevnikov.weatherapp.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import ru.kozhevnikov.weatherapp.model.City;
 import ru.kozhevnikov.weatherapp.model.Weather;
 
 import java.util.*;
@@ -15,27 +16,34 @@ public class WeatherDataProcessor {
      * @param currentWeatherNode JSON-структура с текущими данными о погоде
      * @return список строк, содержащих текущую температуру, описание и ощущаемую температуру
      */
+    private City city;
     private Weather weather;
 
-    public Weather getWeather(String location,
-                              JsonNode cur,
-                              JsonNode hourly,
-                              JsonNode forecast) {
-        weather = new Weather(location);
+    public City getCity(String name,
+                        JsonNode cur,
+                        JsonNode hourly,
+                        JsonNode forecast) {
+        city = new City(name);
+        weather = new Weather();
         initCurrentWeather(cur);
         initHourlyWeather(hourly);
         initWeatherForecast(forecast);
-        return weather;
+        city.setWeather(weather);
+        return city;
     }
 
     public void initCurrentWeather(JsonNode currentWeatherNode) {
         int  currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
         String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
         int currentTemperatureFeelsLike = currentWeatherNode.get("current").get("feelslike_c").asInt();
+        int cloud = currentWeatherNode.get("current").get("cloud").asInt();
+        double precipitation = currentWeatherNode.get("current").get("precip_mm").asDouble();
 
         weather.setCurrentTemperature(currentTemperature);
         weather.setCurrentText(currentText);
         weather.setCurrentTemperatureFeelsLike(currentTemperatureFeelsLike);
+        weather.setCloud(cloud);
+        weather.setPrecipitation(precipitation);
     }
 
     /**
