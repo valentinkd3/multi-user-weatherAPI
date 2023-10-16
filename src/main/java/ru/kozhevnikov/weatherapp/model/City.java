@@ -1,14 +1,19 @@
 package ru.kozhevnikov.weatherapp.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-
+/**
+ * Класс {@code City} является моделью, представляющей собой информацию о городе и о связанной с ним погодой.
+ */
 public class City {
     private int id;
     private String name;
     private Weather weather;
 
+    /**
+     * Конструктор для создания нового объекта {@code City} с заданным назывнием города объекта {@code Weather} для этого города.
+     *
+     * @param name название города
+     */
     public City(String name) {
         this.name = name;
         weather = new Weather();

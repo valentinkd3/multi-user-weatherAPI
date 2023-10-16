@@ -8,9 +8,19 @@ import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
-
+/**
+ * Класс {@code CityDAO} предоставляет методы для взаимодействия с базой данных и выполнения операций с моделями
+ * {@code City} и {@code Weather}.
+ */
 public class CityDAO {
     private static Connection connection = ConnectionManager.open();
+    /**
+     * Метод принимает объект типа City и добавляет его в базу данных.
+     * Если город уже существует в базе, метод проверяет наличие данных о погоде на сегодня.
+     * Если данные сегодняшней даты уже присутствуют, то они обновляются, иначе создается новая запись погоды.
+     *
+     * @param city объект типа City, который необходимо добавить в базу данных
+     */
     public void acceptToDatabase(City city) {
         if (getCities().contains(city)){
             if (isContainsTodayData(city)){
@@ -25,13 +35,11 @@ public class CityDAO {
             saveWeather(city.getWeather());
         }
     }
-    private boolean isContainsTodayData(City city){
-        int id = getCityID(city);
-        for(Weather weatherFromDb : getWeathersForCity(id)){
-            if (weatherFromDb.getDate().equals(city.getWeather().getDate())) return true;
-        }
-        return false;
-    }
+    /**
+     * Метод возвращает список объектов City, для которых имеются данные о погоде на текущую дату.
+     *
+     * @return cписок объектов City с данными о погоде на текущую дату
+     */
     public List<City> getTodayDateFromDb() {
         List<City> cities = new ArrayList<>();
         LocalDate todayDate = LocalDate.now();
@@ -47,6 +55,13 @@ public class CityDAO {
             }
         }
         return cities;
+    }
+    private boolean isContainsTodayData(City city){
+        int id = getCityID(city);
+        for(Weather weatherFromDb : getWeathersForCity(id)){
+            if (weatherFromDb.getDate().equals(city.getWeather().getDate())) return true;
+        }
+        return false;
     }
     private List<Weather> getWeathersForCity(int cityId){
         List<Weather> weathers = new ArrayList<>();
@@ -71,7 +86,7 @@ public class CityDAO {
         }
         return weathers;
     }
-    public List<City> getCities() {
+    private List<City> getCities() {
         List<City> cities = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement("SELECT name FROM City")) {

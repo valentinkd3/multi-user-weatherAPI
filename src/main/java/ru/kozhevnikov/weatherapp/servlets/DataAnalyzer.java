@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * Сервлет, в котором реализована логика передачи данных о погоде, содержащихся в базе данных, на представление - JSP страницу.
+ */
 @WebServlet("/get_data")
 public class DataAnalyzer extends HttpServlet {
     private CityDAO cityDAO = new CityDAO();

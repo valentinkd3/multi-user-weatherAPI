@@ -8,20 +8,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
 /**
  * Класс {@code WeatherDataProcessor} предоставляет методы для обработки данных о погоде, полученных из JSON-структур.
  */
 public class WeatherDataProcessor {
-    /**
-     * Получает текущие данные о погоде и возвращает их в виде списка строк.
-     *
-     * @param currentWeatherNode JSON-структура с текущими данными о погоде
-     * @return список строк, содержащих текущую температуру, описание и ощущаемую температуру
-     */
     private City city;
     private Weather weather;
 
+    /**
+     * Возвращает объект класса {@code City}, содержащий информацию о названии города, текущей погоде,
+     * почасовом прогнозе погоды и о прогнозе погоды на ближайшие дни, полученную из соотвутствующих JSON-структур.
+     *
+     * @param name     название города
+     * @param cur      JSON-структура с текущей погодой
+     * @param hourly   JSON-структура с почасовым прогнозом погоды
+     * @param forecast JSON-структура с прогнозом погоды на ближайшие дни
+     * @return объект {@code City} с данными о городе и погоде
+     */
     public City getCity(String name,
                         JsonNode cur,
                         JsonNode hourly,
@@ -34,8 +37,7 @@ public class WeatherDataProcessor {
         city.setWeather(weather);
         return city;
     }
-
-    public void initCurrentWeather(JsonNode currentWeatherNode) {
+    private void initCurrentWeather(JsonNode currentWeatherNode) {
         int  currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
         String currentText = currentWeatherNode.get("current").get("condition").get("text").asText();
         int currentTemperatureFeelsLike = currentWeatherNode.get("current").get("feelslike_c").asInt();
@@ -58,13 +60,7 @@ public class WeatherDataProcessor {
         return dateTime.toLocalDate();
     }
 
-    /**
-     * Получает почасовой прогноз погоды и возвращает его в виде отображения (Map) с ключами - часами и значениями - данными о погоде.
-     *
-     * @param hourlyWeatherNode JSON-структура с почасовым прогнозом погоды
-     * @return отображение с данными о погоде для каждого часа в течение суток
-     */
-    public void initHourlyWeather(JsonNode hourlyWeatherNode) {
+    private void initHourlyWeather(JsonNode hourlyWeatherNode) {
         Map<String, Integer> hourlyWeather = new LinkedHashMap<>();
         for (int i = 0; i < 24; i++) {
             String date = hourlyWeatherNode.get("forecast")
@@ -85,13 +81,7 @@ public class WeatherDataProcessor {
         weather.setHourlyWeather(hourlyWeather);
     }
 
-    /**
-     * Получает прогноз погоды на ближайшие дни и возвращает его в виде отображения (Map) с ключами - датами и значениями - данными о погоде.
-     *
-     * @param hourlyWeatherNode JSON-структура с прогнозом погоды на ближайшие дни
-     * @return отображение с данными о погоде на ближайшие дни
-     */
-    public void initWeatherForecast(JsonNode hourlyWeatherNode) {
+    private void initWeatherForecast(JsonNode hourlyWeatherNode) {
         Map<String, Integer> weatherForecast = new LinkedHashMap<>();
         for (int i = 0; i < 3; i++) {
             String date = hourlyWeatherNode.get("forecast")

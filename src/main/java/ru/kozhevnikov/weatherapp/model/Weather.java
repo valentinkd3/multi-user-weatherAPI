@@ -2,7 +2,9 @@ package ru.kozhevnikov.weatherapp.model;
 
 import java.time.LocalDate;
 import java.util.Map;
-
+/**
+ * Класс {@code Weather} является моделью, представляющей собой информацию о погода в городе.
+ */
 public class Weather {
     private int id;
     private City city;
