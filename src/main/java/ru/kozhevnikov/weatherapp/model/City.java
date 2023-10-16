@@ -1,5 +1,7 @@
 package ru.kozhevnikov.weatherapp.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class City {
@@ -10,7 +12,6 @@ public class City {
     public City(String name) {
         this.name = name;
         weather = new Weather();
-        weather.setCity(this);
     }
 
     public int getId() {
@@ -35,7 +36,7 @@ public class City {
 
     public void setWeather(Weather weather) {
         this.weather = weather;
-        weather.setCity(this);
+        this.weather.setCity(this);
     }
 
     @Override
@@ -54,7 +55,9 @@ public class City {
     @Override
     public String toString() {
         return "City{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", weather=" + weather +
                 '}';
     }
 }

@@ -25,7 +25,7 @@ public class MainServlet extends HttpServlet {
      * Ключ API для доступа к сервису погоды.
      */
     private static final String API_KEY = ApiConnection.getApiKey();
-    private CityDAO weatherDAO = new CityDAO();
+    private CityDAO cityDAO = new CityDAO();
     private WeatherApiService weatherApiService = new WeatherApiService(API_KEY);
     private WeatherDataProcessor weatherDataProcessor = new WeatherDataProcessor();
     private static final String NO_PARAMS = "Передайте в параметры запроса город, в котором Вы хотите узнать погоду";
@@ -53,8 +53,6 @@ public class MainServlet extends HttpServlet {
             dispatcher.forward(req, resp);
         }
     }
-
-
     private boolean initJsonNodesAndSetAttributes(HttpServletRequest req) throws IOException {
         JsonNode currentData = weatherApiService.getJsonCurrentWeather(location);
         JsonNode hourlyWeatherData = weatherApiService.getJsonHourlyWeather(location);
@@ -65,7 +63,7 @@ public class MainServlet extends HttpServlet {
         }
 
         City city = weatherDataProcessor.getCity(location, currentData,hourlyWeatherData,weatherForecastData);
-        weatherDAO.acceptToDatabase(city);
+        cityDAO.acceptToDatabase(city);
         req.setAttribute("city", city);
 
         return true;

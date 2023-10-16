@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import ru.kozhevnikov.weatherapp.model.City;
 import ru.kozhevnikov.weatherapp.model.Weather;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -34,16 +37,25 @@ public class WeatherDataProcessor {
 
     public void initCurrentWeather(JsonNode currentWeatherNode) {
         int  currentTemperature = currentWeatherNode.get("current").get("temp_c").asInt();
-        String currentText = currentWeatherNode.get("current").get("condition").get("text").toString();
+        String currentText = currentWeatherNode.get("current").get("condition").get("text").asText();
         int currentTemperatureFeelsLike = currentWeatherNode.get("current").get("feelslike_c").asInt();
         int cloud = currentWeatherNode.get("current").get("cloud").asInt();
         double precipitation = currentWeatherNode.get("current").get("precip_mm").asDouble();
+        LocalDate date = getLocalDateFromJson(currentWeatherNode);
 
         weather.setCurrentTemperature(currentTemperature);
         weather.setCurrentText(currentText);
         weather.setCurrentTemperatureFeelsLike(currentTemperatureFeelsLike);
         weather.setCloud(cloud);
         weather.setPrecipitation(precipitation);
+        weather.setDate(date);
+    }
+    private LocalDate getLocalDateFromJson(JsonNode currentWeatherNode){
+        String currentDateStr = currentWeatherNode.get("location").get("localtime").asText();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm");
+        LocalDateTime dateTime = LocalDateTime.parse(currentDateStr,formatter);
+
+        return dateTime.toLocalDate();
     }
 
     /**
@@ -60,7 +72,7 @@ public class WeatherDataProcessor {
                     .get(0)
                     .get("hour")
                     .get(i)
-                    .get("time").toString();
+                    .get("time").asText();
             int temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(0)
@@ -85,7 +97,7 @@ public class WeatherDataProcessor {
             String date = hourlyWeatherNode.get("forecast")
                     .get("forecastday")
                     .get(i)
-                    .get("date").toString();
+                    .get("date").asText();
 
             int temperature = hourlyWeatherNode.get("forecast")
                     .get("forecastday")

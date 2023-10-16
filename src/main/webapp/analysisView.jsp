@@ -18,11 +18,12 @@
     List<City> cities = (List<City>) request.getAttribute("cities");
     City hotCity = (City) request.getAttribute("hot");
     City coldCity = (City) request.getAttribute("cold");
+    out.println("<h1>Сегодня " + cities.get(0).getWeather().getDate() + ". Сводные данные о погоде: " + "</h1>");
     for(City city : cities){
       Weather weather = city.getWeather();
       out.println("<p>" + city.getName() + ": Средняя температура : " + weather.getAverageTemperature() + " °C. " +
               "Облачность : " + weather.getCloud() + " %. " + " Количество осадков : " +
-      weather.getPrecipitation() + " мм.</p>");
+      weather.getPrecipitation() + " мм. " + weather.getCurrentText() + ".</p>");
     }
   %>
   <p>

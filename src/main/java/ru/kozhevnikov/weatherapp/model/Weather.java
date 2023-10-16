@@ -1,6 +1,6 @@
 package ru.kozhevnikov.weatherapp.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Map;
 
 public class Weather {
@@ -12,10 +12,9 @@ public class Weather {
     private int averageTemperature;
     private int cloud;
     private double precipitation;
+    private LocalDate date;
     private Map<String, Integer> hourlyWeather;
     private Map<String, Integer> forecastWeather;
-
-
     public int getId() {
         return id;
     }
@@ -90,16 +89,24 @@ public class Weather {
         this.precipitation = precipitation;
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Weather{" +
-                "city=" + city.getName() +
-                ", currentTemperature=" + currentTemperature +
+                "currentTemperature=" + currentTemperature +
                 ", currentTemperatureFeelsLike=" + currentTemperatureFeelsLike +
                 ", currentText='" + currentText + '\'' +
                 ", averageTemperature=" + averageTemperature +
                 ", cloud=" + cloud +
                 ", precipitation=" + precipitation +
+                ", date=" + date +
                 '}';
     }
 }
