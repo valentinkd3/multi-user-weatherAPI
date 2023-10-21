@@ -35,11 +35,8 @@ public class WeatherServlet extends HttpServlet {
     private final UserCityDAO userCityDAO = UserCityDAO.getInstance();
     private final WeatherDAO weatherDAO = WeatherDAO.getInstance();
     private final WeatherApiService weatherApiService = new WeatherApiService(API_KEY);
-    private static final String NO_USE = """
-            Ранее вы не использовали наш сервис для просмотра погоды.
-            \nВведите название интересующего Вас города в адресную строку (прим. /weather?location=Moscow).
-            """;
-    private static final String NO_ENTER = "Для использования сервиса необходимо авторизоваться";
+    private static final String NO_USE = "Ранее вы не использовали наш сервис для просмотра погоды.\n" +
+                                         "Введите название интересующего Вас города в адресную строку (прим. /weather?location=Moscow).";
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
     private String location;
 
@@ -51,8 +48,9 @@ public class WeatherServlet extends HttpServlet {
         HttpSession session = req.getSession();
 
         String username = (String) session.getAttribute("username");
+
         if (username == null) {
-            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/authorization/needauth.jsp");
+            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/authorization/toLogin.jsp");
             requestDispatcher.forward(req,resp);
         }
 

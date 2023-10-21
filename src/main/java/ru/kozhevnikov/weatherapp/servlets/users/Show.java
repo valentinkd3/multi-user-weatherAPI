@@ -1,11 +1,10 @@
 package ru.kozhevnikov.weatherapp.servlets.users;
 
-import ru.kozhevnikov.weatherapp.dao.CityDAO;
 import ru.kozhevnikov.weatherapp.dao.UserCityDAO;
 import ru.kozhevnikov.weatherapp.dao.UserDAO;
 import ru.kozhevnikov.weatherapp.dao.WeatherDAO;
 import ru.kozhevnikov.weatherapp.entity.City;
-import ru.kozhevnikov.weatherapp.entity.Weather;
+import ru.kozhevnikov.weatherapp.entity.UserCity;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,10 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @WebServlet("/users/*")
 public class Show extends HttpServlet {
@@ -33,10 +30,10 @@ public class Show extends HttpServlet {
 
         StringBuilder stringBuilder = new StringBuilder(req.getPathInfo());
         userId = Integer.parseInt(stringBuilder.replace(0,1,"").toString());
-        LinkedHashMap<LocalDateTime,City> journal = (LinkedHashMap<LocalDateTime, City>) userCityDAO.findCitiesByUserId(userId);
-        System.out.println(journal);
+        List<UserCity> journal = userCityDAO.findCitiesByUserId(userId);
+
         req.setAttribute("journal", journal);
-        req.setAttribute("user", userDAO.findByID(userId).get());
+        req.setAttribute("user", userDAO.findById(userId).get());
 
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/users/show.jsp");
         requestDispatcher.forward(req,resp);

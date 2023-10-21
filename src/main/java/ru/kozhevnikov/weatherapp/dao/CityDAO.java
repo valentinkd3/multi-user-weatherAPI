@@ -1,7 +1,6 @@
 package ru.kozhevnikov.weatherapp.dao;
 
 import ru.kozhevnikov.weatherapp.entity.City;
-import ru.kozhevnikov.weatherapp.entity.Weather;
 import ru.kozhevnikov.weatherapp.exception.DaoException;
 import ru.kozhevnikov.weatherapp.utils.ConnectionManager;
 

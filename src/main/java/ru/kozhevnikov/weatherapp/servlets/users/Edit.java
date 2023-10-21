@@ -42,7 +42,7 @@ public class Edit extends HttpServlet {
             return;
         }
 
-        Optional<User> maybeUser = userDAO.findByID(userId);
+        Optional<User> maybeUser = userDAO.findById(userId);
         maybeUser.ifPresent(user -> {
             user.setUsername(username);
             user.setPassword(password);
