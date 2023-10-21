@@ -25,6 +25,7 @@ public class UserCityDAO implements DAO<UserCity> {
             SELECT id,user_id,city_id, createat
             FROM usercity
             WHERE user_id = ?
+            ORDER BY id
             """;
 
     private UserCityDAO() {
