@@ -39,6 +39,7 @@ public class WeatherServlet extends HttpServlet {
                                          "Введите название интересующего Вас города в адресную строку (прим. /weather?location=Moscow).";
     private static final String INCORRECT_NAME = "Название города введено некорректо. Попробуйте еще раз.";
     private String location;
+    private User authorizedUser;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -46,49 +47,62 @@ public class WeatherServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         HttpSession session = req.getSession();
-
         String username = (String) session.getAttribute("username");
+        checkUsername(req, resp, username);
 
-        if (username == null) {
-            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/authorization/toLogin.jsp");
-            requestDispatcher.forward(req,resp);
+        initialLocation(req, resp, session, username);
+
+        City savedCity = saveCity();
+        Weather weather = initWeatherFromJSON(location);
+
+        if (weather == null) {
+            deleteCityFromDb(resp);
+        } else {
+            req.setAttribute("weather", weatherDAO.save(weather));
+
+            initialUserCity(savedCity);
+
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/weather.jsp");
+            dispatcher.forward(req, resp);
         }
+    }
 
-        User user = userDAO.findByName(username).get();
-        City lastCity = userCityDAO.getLastCity(user.getId());
+    private void initialUserCity(City savedCity) {
+        UserCity userCity = new UserCity();
+        userCity.setUser(authorizedUser);
+        userCity.setCity(savedCity);
+        userCityDAO.save(userCity);
+    }
 
-        location = req.getParameter("location");
+    private void deleteCityFromDb(HttpServletResponse resp) throws IOException {
+        cityDAO.deleteByName(location);
+        resp.getWriter().write(INCORRECT_NAME);
+    }
 
-        if (lastCity == null && location == null) {
-            resp.getWriter().write(NO_USE);
-            return;
-        }
-        else if (location == null){
-            location = lastCity.getName();
-        }
-
-        session.setAttribute("location", location);
-
+    private City saveCity() {
         City city = new City();
         city.setName(location);
         cityDAO.save(city);
-        City savedCity = cityDAO.findByName(location).get();
+        return cityDAO.findByName(location).get();
+    }
 
-        Weather weather = initWeatherFromJSON(location);
-        if (weather == null){
-            resp.getWriter().write(INCORRECT_NAME);
-            cityDAO.deleteByName(location);
-            return;
+    private void initialLocation(HttpServletRequest req, HttpServletResponse resp, HttpSession session, String username) throws IOException {
+        authorizedUser = userDAO.findByName(username).get();
+        City lastCity = userCityDAO.getLastCity(authorizedUser.getId());
+        location = req.getParameter("location");
+        if (lastCity == null && location == null) {
+            resp.getWriter().write(NO_USE);
+        } else if (location == null) {
+            location = lastCity.getName();
         }
-        Weather savedWeather = weatherDAO.save(weather);
-        UserCity userCity = new UserCity();
-        userCity.setUser(user);
-        userCity.setCity(savedCity);
-        userCityDAO.save(userCity);
+        session.setAttribute("location", location);
+    }
 
-        req.setAttribute("weather", savedWeather);
-        RequestDispatcher dispatcher = req.getRequestDispatcher("/weather.jsp");
-        dispatcher.forward(req, resp);
+    private static void checkUsername(HttpServletRequest req, HttpServletResponse resp, String username) throws ServletException, IOException {
+        if (username == null) {
+            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/authorization/toLogin.jsp");
+            requestDispatcher.forward(req, resp);
+        }
     }
 
     private Weather initWeatherFromJSON(String location) {
