@@ -1,35 +1,40 @@
 package ru.kozhevnikov.weatherapp.entity;
 
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
-public class Weather {
-    private int id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+@Entity
+@Table(name = "weather")
+public class Weather implements BaseEntity<Integer>{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+    @ManyToOne
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
     private City city;
+    @Column(name = "text")
     private String text;
+    @Column(name = "curTemp")
     private Integer curTemp;
+    @Column(name = "feelsLike")
     private Integer feelsLike;
+    @Column(name = "cloud")
     private Integer cloud;
+    @Column(name = "precipitation")
     private Double precipitation;
+    @Column(name = "createAt")
+    @CreationTimestamp
     private LocalDateTime createAt;
 
     public Weather() {
     }
-    public Weather(int id, City city, String text, Integer curTemp, Integer feelsLike, Integer cloud, Double precipitation, LocalDateTime createAt) {
-        this.id = id;
-        this.city = city;
-        this.text = text;
-        this.curTemp = curTemp;
-        this.feelsLike = feelsLike;
-        this.cloud = cloud;
-        this.precipitation = precipitation;
-        this.createAt = createAt;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

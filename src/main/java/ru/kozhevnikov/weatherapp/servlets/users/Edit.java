@@ -1,7 +1,9 @@
 package ru.kozhevnikov.weatherapp.servlets.users;
 
-import ru.kozhevnikov.weatherapp.dao.UserDAO;
+import org.hibernate.SessionFactory;
 import ru.kozhevnikov.weatherapp.entity.User;
+import ru.kozhevnikov.weatherapp.repository.UserRepository;
+import ru.kozhevnikov.weatherapp.utils.HibernateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,7 +16,8 @@ import java.util.Optional;
 
 @WebServlet("/users/edit/*")
 public class Edit extends HttpServlet {
-    private final UserDAO userDAO = UserDAO.getInstance();
+    private final SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+    private final UserRepository userRepository = new UserRepository(sessionFactory);
     private static final String NO_UNIQUE = "Пользователь с таким именем уже существует";
     private Integer userId;
     @Override
@@ -42,22 +45,21 @@ public class Edit extends HttpServlet {
             return;
         }
 
-        Optional<User> maybeUser = userDAO.findById(userId);
+        Optional<User> maybeUser = userRepository.findById(userId);
         maybeUser.ifPresent(user -> {
             user.setUsername(username);
             user.setPassword(password);
-            userDAO.update(user);
+            userRepository.update(user);
         });
 
         resp.sendRedirect("/users");
     }
 
     private boolean checkUsername(String username) {
-        return userDAO.findByName(username).isPresent();
+        return userRepository.findUserByName(username).isPresent();
     }
 
-
     private boolean isUniqueUsername(User user){
-        return userDAO.findAll().contains(user);
+        return userRepository.findAll().contains(user);
     }
 }

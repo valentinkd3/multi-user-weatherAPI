@@ -1,26 +1,29 @@
 package ru.kozhevnikov.weatherapp.entity;
 
+import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-
-public class User {
+@Entity
+@Table(name = "users")
+public class User implements BaseEntity<Integer>{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
+    @Column(name = "username")
     private String username;
+    @Column(name = "password")
     private String password;
+    @ManyToMany(mappedBy = "users")
+    private List<City> cities;
 
     public User() {
     }
-
-    public User(Integer id, String username, String password) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-    }
-
     public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

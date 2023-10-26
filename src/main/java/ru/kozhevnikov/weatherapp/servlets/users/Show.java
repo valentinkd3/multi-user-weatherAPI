@@ -1,10 +1,11 @@
 package ru.kozhevnikov.weatherapp.servlets.users;
 
-import ru.kozhevnikov.weatherapp.dao.UserCityDAO;
-import ru.kozhevnikov.weatherapp.dao.UserDAO;
-import ru.kozhevnikov.weatherapp.dao.WeatherDAO;
-import ru.kozhevnikov.weatherapp.entity.City;
+import org.hibernate.SessionFactory;
 import ru.kozhevnikov.weatherapp.entity.UserCity;
+import ru.kozhevnikov.weatherapp.repository.UserCityRepository;
+import ru.kozhevnikov.weatherapp.repository.UserRepository;
+import ru.kozhevnikov.weatherapp.repository.WeatherRepository;
+import ru.kozhevnikov.weatherapp.utils.HibernateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,16 +14,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 @WebServlet("/users/*")
 public class Show extends HttpServlet {
     private Integer userId;
-    private final UserDAO userDAO = UserDAO.getInstance();
-    private final WeatherDAO weatherDAO = WeatherDAO.getInstance();
-    private final UserCityDAO userCityDAO = UserCityDAO.getInstance();
+    private final SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+    private final UserRepository userRepository = new UserRepository(sessionFactory);
+    private final UserCityRepository userCityRepository = new UserCityRepository(sessionFactory);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html; charset=UTF-8");
@@ -30,10 +29,10 @@ public class Show extends HttpServlet {
 
         StringBuilder stringBuilder = new StringBuilder(req.getPathInfo());
         userId = Integer.parseInt(stringBuilder.replace(0,1,"").toString());
-        List<UserCity> journal = userCityDAO.findCitiesByUserId(userId);
+        List<UserCity> journal = userCityRepository.getJournalByUserId(userId);
 
         req.setAttribute("journal", journal);
-        req.setAttribute("user", userDAO.findById(userId).get());
+        req.setAttribute("user", userRepository.findById(userId).get());
 
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/WEB-INF/users/show.jsp");
         requestDispatcher.forward(req,resp);
@@ -41,7 +40,7 @@ public class Show extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        userDAO.delete(userId);
+        userRepository.delete(userId);
         resp.sendRedirect("/users");
     }
 }

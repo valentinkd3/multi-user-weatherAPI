@@ -1,16 +1,18 @@
 package ru.kozhevnikov.weatherapp.servlets.weather;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hibernate.SessionFactory;
 import ru.kozhevnikov.weatherapp.api.WeatherApiService;
-import ru.kozhevnikov.weatherapp.dao.CityDAO;
-import ru.kozhevnikov.weatherapp.dao.UserCityDAO;
-import ru.kozhevnikov.weatherapp.dao.UserDAO;
-import ru.kozhevnikov.weatherapp.dao.WeatherDAO;
 import ru.kozhevnikov.weatherapp.entity.City;
 import ru.kozhevnikov.weatherapp.entity.User;
 import ru.kozhevnikov.weatherapp.entity.UserCity;
 import ru.kozhevnikov.weatherapp.entity.Weather;
+import ru.kozhevnikov.weatherapp.repository.CityRepository;
+import ru.kozhevnikov.weatherapp.repository.UserCityRepository;
+import ru.kozhevnikov.weatherapp.repository.UserRepository;
+import ru.kozhevnikov.weatherapp.repository.WeatherRepository;
 import ru.kozhevnikov.weatherapp.utils.ApiConnection;
+import ru.kozhevnikov.weatherapp.utils.HibernateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -30,10 +32,11 @@ public class WeatherServlet extends HttpServlet {
      * Ключ API для доступа к сервису погоды.
      */
     private static final String API_KEY = ApiConnection.getApiKey();
-    private final CityDAO cityDAO = CityDAO.getInstance();
-    private final UserDAO userDAO = UserDAO.getInstance();
-    private final UserCityDAO userCityDAO = UserCityDAO.getInstance();
-    private final WeatherDAO weatherDAO = WeatherDAO.getInstance();
+    private final SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+    private final UserRepository userRepository = new UserRepository(sessionFactory);
+    private final WeatherRepository weatherRepository = new WeatherRepository(sessionFactory);
+    private final UserCityRepository userCityRepository = new UserCityRepository(sessionFactory);
+    private final CityRepository cityRepository = new CityRepository(sessionFactory);
     private final WeatherApiService weatherApiService = new WeatherApiService(API_KEY);
     private static final String NO_USE = "Ранее вы не использовали наш сервис для просмотра погоды.\n" +
                                          "Введите название интересующего Вас города в адресную строку (прим. /weather?location=Moscow).";
@@ -53,12 +56,12 @@ public class WeatherServlet extends HttpServlet {
         initialLocation(req, resp, session, username);
 
         City savedCity = saveCity();
-        Weather weather = initWeatherFromJSON(location);
+        Weather weather = initWeatherFromJSON(savedCity);
 
         if (weather == null) {
-            deleteCityFromDb(resp);
+//            deleteCityFromDb(resp);
         } else {
-            req.setAttribute("weather", weatherDAO.save(weather));
+            req.setAttribute("weather", weatherRepository.save(weather));
 
             initialUserCity(savedCity);
 
@@ -71,24 +74,24 @@ public class WeatherServlet extends HttpServlet {
         UserCity userCity = new UserCity();
         userCity.setUser(authorizedUser);
         userCity.setCity(savedCity);
-        userCityDAO.save(userCity);
+        userCityRepository.save(userCity);
     }
 
-    private void deleteCityFromDb(HttpServletResponse resp) throws IOException {
-        cityDAO.deleteByName(location);
-        resp.getWriter().write(INCORRECT_NAME);
-    }
+//    private void deleteCityFromDb(HttpServletResponse resp) throws IOException {
+//        cityRepository.delete(location);
+//        resp.getWriter().write(INCORRECT_NAME);
+//    }
 
     private City saveCity() {
         City city = new City();
         city.setName(location);
-        cityDAO.save(city);
-        return cityDAO.findByName(location).get();
+        cityRepository.save(city);
+        return cityRepository.findCityByName(location).get();
     }
 
     private void initialLocation(HttpServletRequest req, HttpServletResponse resp, HttpSession session, String username) throws IOException {
-        authorizedUser = userDAO.findByName(username).get();
-        City lastCity = userCityDAO.getLastCity(authorizedUser.getId());
+        authorizedUser = userRepository.findUserByName(username).get();
+        City lastCity = userCityRepository.getLastCity(authorizedUser.getId());
         location = req.getParameter("location");
         if (lastCity == null && location == null) {
             resp.getWriter().write(NO_USE);
@@ -105,11 +108,11 @@ public class WeatherServlet extends HttpServlet {
         }
     }
 
-    private Weather initWeatherFromJSON(String location) {
+    private Weather initWeatherFromJSON(City city) {
         JsonNode currentData = weatherApiService.getJsonCurrentWeather(location);
         if (currentData == null) return null;
         Weather weather = new Weather();
-        weather.setCity(cityDAO.findByName(location).orElse(null));
+        weather.setCity(city);
         weather.setText(currentData.get("current").get("condition").get("text").asText());
         weather.setCurTemp(currentData.get("current").get("temp_c").asInt());
         weather.setFeelsLike(currentData.get("current").get("feelslike_c").asInt());

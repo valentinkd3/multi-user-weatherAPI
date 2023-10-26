@@ -1,7 +1,9 @@
 package ru.kozhevnikov.weatherapp.servlets.users;
 
-import ru.kozhevnikov.weatherapp.dao.UserDAO;
+import org.hibernate.SessionFactory;
 import ru.kozhevnikov.weatherapp.entity.User;
+import ru.kozhevnikov.weatherapp.repository.UserRepository;
+import ru.kozhevnikov.weatherapp.utils.HibernateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,7 +15,8 @@ import java.io.IOException;
 
 @WebServlet("/users/new")
 public class New extends HttpServlet {
-    private final UserDAO userDAO = UserDAO.getInstance();
+    private final SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+    private final UserRepository userRepository = new UserRepository(sessionFactory);
     private static final String NO_UNIQUE = "Пользователь с таким именем уже существует";
 
     @Override
@@ -44,11 +47,11 @@ public class New extends HttpServlet {
         user.setUsername(username);
         user.setPassword(password);
 
-        userDAO.save(user);
+        userRepository.save(user);
 
         resp.sendRedirect("/users");
     }
     private boolean checkUsername(String username){
-        return userDAO.findByName(username).isPresent();
+        return userRepository.findUserByName(username).isPresent();
     }
 }

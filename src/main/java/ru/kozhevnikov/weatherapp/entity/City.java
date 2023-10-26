@@ -1,30 +1,49 @@
 package ru.kozhevnikov.weatherapp.entity;
 
+
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Класс {@code City} является моделью, представляющей собой информацию о городе и о связанной с ним погодой.
- */
-public class City {
+@Entity
+@Table(name = "city")
+public class City implements BaseEntity<Integer>{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
+    @Column(name = "name")
     private String name;
+    @ManyToMany
+    @JoinTable(
+            name = "users_city",
+            joinColumns = @JoinColumn(name = "city_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
+    @OneToMany(mappedBy = "city", cascade = CascadeType.PERSIST)
     private List<Weather> weathers;
 
     public City() {
     }
-
-    public City(Integer id, String name) {
-        this.id = id;
+    public City(String name) {
         this.name = name;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

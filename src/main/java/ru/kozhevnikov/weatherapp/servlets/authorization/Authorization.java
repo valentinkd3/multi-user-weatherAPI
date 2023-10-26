@@ -1,7 +1,9 @@
 package ru.kozhevnikov.weatherapp.servlets.authorization;
 
-import ru.kozhevnikov.weatherapp.dao.UserDAO;
+import org.hibernate.SessionFactory;
 import ru.kozhevnikov.weatherapp.entity.User;
+import ru.kozhevnikov.weatherapp.repository.UserRepository;
+import ru.kozhevnikov.weatherapp.utils.HibernateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,7 +14,8 @@ import java.util.Optional;
 
 @WebServlet("/login")
 public class Authorization extends HttpServlet {
-    private final UserDAO userDAO = UserDAO.getInstance();
+    private final SessionFactory sessionFactory = HibernateUtil.buildSessionFactory();
+    private final UserRepository userRepository = new UserRepository(sessionFactory);
     private static final String NO_USER = "Пользователя с таким именем и/или паролем не существует";
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -50,7 +53,7 @@ public class Authorization extends HttpServlet {
     }
 
     private boolean isValidUser(String username, String password){
-        Optional<User> potentialUser = userDAO.findByName(username);
+        Optional<User> potentialUser = userRepository.findUserByName(username);
         if (potentialUser.isPresent()){
             return potentialUser.get().getPassword().equals(password);
         }
