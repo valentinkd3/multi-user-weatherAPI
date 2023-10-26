@@ -12,6 +12,13 @@ import java.util.List;
 public class UserCityRepository extends RepositoryBase<Integer, UserCity> {
     private SessionFactory sessionFactory;
     private final UserRepository userRepository;
+    private static final String JOURNAL_HQL = """
+            SELECT j 
+            FROM UserCity j 
+            LEFT JOIN FETCH j.city 
+            WHERE j.user = :user 
+            ORDER BY j.id DESC
+            """;
     public UserCityRepository(SessionFactory sessionFactory){
         super(UserCity.class,sessionFactory);
         this.sessionFactory = sessionFactory;
@@ -34,7 +41,7 @@ public class UserCityRepository extends RepositoryBase<Integer, UserCity> {
 
             User user = userRepository.findById(id).get();
 
-            journal = (List<UserCity>) session.createQuery("SELECT j FROM UserCity j LEFT JOIN FETCH j.city WHERE j.user = :user ORDER BY j.id ASC")
+            journal = (List<UserCity>) session.createQuery(JOURNAL_HQL)
                     .setParameter("user", user)
                     .getResultList();
 
@@ -44,7 +51,8 @@ public class UserCityRepository extends RepositoryBase<Integer, UserCity> {
     }
     public City getLastCity(int userId) {
         List<UserCity> journal = getJournalByUserId(userId);
-        return journal.get(journal.size()-1).getCity();
+        if (journal.isEmpty()) return null;
+        return journal.get(0).getCity() ;
     }
 
 }

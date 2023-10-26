@@ -59,7 +59,7 @@ public class WeatherServlet extends HttpServlet {
         Weather weather = initWeatherFromJSON(savedCity);
 
         if (weather == null) {
-//            deleteCityFromDb(resp);
+            cityRepository.delete(savedCity.getId());
         } else {
             req.setAttribute("weather", weatherRepository.save(weather));
 
@@ -71,22 +71,11 @@ public class WeatherServlet extends HttpServlet {
     }
 
     private void initialUserCity(City savedCity) {
-        UserCity userCity = new UserCity();
-        userCity.setUser(authorizedUser);
-        userCity.setCity(savedCity);
-        userCityRepository.save(userCity);
+        userCityRepository.save(new UserCity(authorizedUser,savedCity));
     }
 
-//    private void deleteCityFromDb(HttpServletResponse resp) throws IOException {
-//        cityRepository.delete(location);
-//        resp.getWriter().write(INCORRECT_NAME);
-//    }
-
     private City saveCity() {
-        City city = new City();
-        city.setName(location);
-        cityRepository.save(city);
-        return cityRepository.findCityByName(location).get();
+        return cityRepository.save(new City(location));
     }
 
     private void initialLocation(HttpServletRequest req, HttpServletResponse resp, HttpSession session, String username) throws IOException {

@@ -38,7 +38,7 @@ public class New extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        if (checkUsername(username)) {
+        if (containsUsername(username)) {
             resp.getWriter().write(NO_UNIQUE);
             return;
         }
@@ -51,7 +51,7 @@ public class New extends HttpServlet {
 
         resp.sendRedirect("/users");
     }
-    private boolean checkUsername(String username){
-        return userRepository.findUserByName(username).isPresent();
+    private boolean containsUsername(String username){
+        return userRepository.findAll().contains(new User(username));
     }
 }

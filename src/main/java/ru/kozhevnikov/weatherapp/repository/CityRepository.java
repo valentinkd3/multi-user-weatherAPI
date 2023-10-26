@@ -15,7 +15,7 @@ public class CityRepository extends RepositoryBase<Integer, City> {
     }
     @Override
     public City save(City entity) {
-        if (findCityByName(entity.getName()).isPresent()){
+        if (findAll().contains(entity)){
             return findCityByName(entity.getName()).get();
         }
         try(Session session = sessionFactory.openSession()) {

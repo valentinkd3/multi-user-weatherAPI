@@ -19,6 +19,11 @@ public class User implements BaseEntity<Integer>{
 
     public User() {
     }
+
+    public User(String username) {
+        this.username = username;
+    }
+
     public Integer getId() {
         return id;
     }

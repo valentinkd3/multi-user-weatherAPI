@@ -14,12 +14,13 @@ public class UserRepository extends RepositoryBase<Integer, User> {
         this.sessionFactory = sessionFactory;
     }
     public Optional<User> findUserByName(String username){
-        Optional<User> user = null;
+        Optional<User> user;
         try(Session session = sessionFactory.openSession()) {
             session.beginTransaction();
 
-            Query query = session.createQuery("SELECT u FROM User u WHERE u.username = :username");
-            query.setParameter("username", username);
+            Query query = session.createQuery("SELECT u FROM User u WHERE u.username = :username")
+                    .setParameter("username", username);
+
             user = Optional.ofNullable((User) query.getSingleResult());
 
             session.getTransaction().commit();
