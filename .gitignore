@@ -4,6 +4,7 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
+src/main/java/HibernateRunner.java
 api.properties
 database.properties
 src/main/resources/hibernate.cfg.xml
