@@ -6,7 +6,7 @@ target/
 ### IntelliJ IDEA ###
 api.properties
 database.properties
-hibernate.cfg.xml
+src/main/resources/hibernate.cfg.xml
 .idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
