@@ -53,9 +53,9 @@ public class Authorization extends HttpServlet {
     }
 
     private boolean isValidUser(String username, String password){
-        Optional<User> potentialUser = userRepository.findUserByName(username);
-        if (potentialUser.isPresent()){
-            return potentialUser.get().getPassword().equals(password);
+        Optional<User> maybeUser = userRepository.findUserByName(username);
+        if (!maybeUser.isEmpty()){
+            return maybeUser.get().getPassword().equals(password);
         }
         return false;
     }

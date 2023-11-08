@@ -5,6 +5,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ru.kozhevnikov.weatherapp.entity.User;
 
+import javax.persistence.NoResultException;
+import java.util.List;
 import java.util.Optional;
 
 public class UserRepository extends RepositoryBase<Integer, User> {
@@ -20,9 +22,11 @@ public class UserRepository extends RepositoryBase<Integer, User> {
 
             Query query = session.createQuery("SELECT u FROM User u WHERE u.username = :username")
                     .setParameter("username", username);
-
-            user = Optional.ofNullable((User) query.getSingleResult());
-
+            try{
+                user = Optional.of((User) query.getSingleResult());
+            } catch (NoResultException e){
+                user = Optional.empty();
+            }
             session.getTransaction().commit();
         }
         return user;
